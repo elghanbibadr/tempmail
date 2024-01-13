@@ -1,7 +1,7 @@
 'use client';
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter,Link } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function LoginPage(){
@@ -10,7 +10,7 @@ export default function LoginPage(){
     const router = useRouter()
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-
+  const [isSignUp,setIsSignUp]=useState(true)
 
     const supabase = createClientComponentClient();
 
@@ -85,8 +85,8 @@ export default function LoginPage(){
     }
 
     return (
-        <main className="h-screen flex items-center justify-center bg-gray-800 p-6">
-        <div className="bg-gray-900 p-8 rounded-lg shadow-md w-96">
+        <main  className="flex flex-col justify-center items-center h-screen">
+       {/* <div className="bg-gray-900 p-8 rounded-lg shadow-md w-96">
         <input 
             type="email" 
             name="email"
@@ -115,7 +115,107 @@ export default function LoginPage(){
         >
             Sign In
         </button>
+        </div>  */}
+
+          {/* added */}
+        {/* <div className="flex flex-col justify-center items-center h-screen"> */}
+      <div>
+        {/* <Link to="/"> */}
+          {/* <img className="mx-auto" src={logo} alt="makerkit logo" /> */}
+         <h1 className="text-center text-3xl text-darkPink font-semibold">Temp Mail</h1>
+        {/* </Link> */}
+        <div className="border border-accent1 shadow-pinkBoxShadow2 p-6 rounded-xl mt-10">
+          <h5 className="scroll-m-20 font-heading text-lg font-medium text-white text-center">
+            {isSignUp ? "Create account" : "Sign in to your account"}
+          </h5>
+          <button
+           
+            className="button-transparent mt-6 w-full flex justify-between rounded-md p-4"
+          >
+            {/* <img className="h-6" src={googlelogo} alt="google logo image" /> */}
+            <span className="text-center w-full  text-white">
+              Sign {isSignUp ? "up" : "in"} with Google
+            </span>
+          </button>
+          <span className="text-[.8rem] mt-4 font-medium flex items-center justify-center text-gray-400">
+            or continue with email
+          </span>
+          <div >
+          {/* onSubmit={handleSubmit(onSubmit)} */}
+            <div className="mt-6">
+              <label className="text-lightGrey text-sm font-semibold " htmlFor="email">
+                Email Address
+              </label>
+              <input
+                className="input block w-[400px] "
+                id="email"
+                placeholder="your@email"
+                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                type="email"
+                // {...register("email", { required: "Email is required" })}
+              />
+              {/* {errors.email && (
+                <p className="text-red-600 text-sm font-semibold">
+                  {errors.email.message}
+                </p>
+              )} */}
+            </div>
+            <div className="mt-4">
+              <label className="text-lightGrey text-sm font-semibold " htmlFor="password">
+                Password
+              </label>
+              <input
+                className="input block w-[400px]"
+                id="password"
+                name="password"
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                // {...register("password", { required: "Password is required" })}
+              />
+              {/* {errors.password && (
+                <p className="text-red-600 text-sm font-semibold">
+                  {errors.password.message}
+                </p>
+              )} */}
+              {/* {!isSignUp && (
+                <span className="text-[.79rem] cursor-pointer inline-block mt-4 hover:underline font-medium  text-gray-400">
+                  Password forgotten?
+                </span>
+              )} */}
+            </div>
+       
+            {isSignUp && (
+              <button onClick={handleSignUp} className="button-pink text-white w-full mt-6 rounded-md">
+                Sign up
+              </button>
+            )}
+
+            {isSignUp && (
+              <button onClick={handleSignIn} className="button-pink text-white w-full mt-6 rounded-md">
+                Sign in
+              </button>
+            )}
+          </div>
+          <div className="text-[.8rem] font-medium flex justify-center gap-1 items-center mt-4">
+            <span className="text-white">
+              {" "}
+              {isSignUp
+                ? "Already have an account"
+                : "Do not have an account yet?"}
+            </span>
+            {
+            //   <Link href={`${isSignUp ? "/auth/signin" : "/auth/signup"}`}>
+            //     <span className="text-darkPink cursor-pointer hover:underline">
+            //       {isSignUp ? "Sign In" : "Sign Up"}
+            //     </span>
+            //   </Link>
+            }
+          </div>
         </div>
+      </div>
+    {/* </div> */}
+        {/* added */}
         </main>
     )
 
