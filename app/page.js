@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import Link from 'next/link';
-
+import { Email } from './componenet/GetEmail';
 
 export default async function Home() {
   const cookieStore = cookies();
@@ -31,6 +31,7 @@ export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <h1>hello {user.email}</h1>
+      <Email/>
     </main>
   )
 }

@@ -3,15 +3,7 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-const emailurl = 'https://temp-gmail.p.rapidapi.com/check?email=ashley.santms031993@gmail.com&timestamp=1704914777';
-const url = 'https://temp-gmail.p.rapidapi.com/get?domain=gmail.com&username=random&server=server-1&type=real';
-const options = {
-	method: 'GET',
-	headers: {
-		'X-RapidAPI-Key': '981133e597mshf67d3a4955b7df3p109b23jsn70341f1012a1',
-		'X-RapidAPI-Host': 'temp-gmail.p.rapidapi.com'
-	}
-};
+
 export default function LoginPage(){
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -65,27 +57,6 @@ export default function LoginPage(){
     }
 
     // -------
-    
-
-const getEmail=async () =>{
-  try {
-    const response = await fetch(emailurl, options);
-    const result = await response.json();
-    // console.log(result["items"])
-    console.log(result);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-
-
-useEffect(() =>{
-  if(user){
-    getEmail()
- 
-  }
-},[user])
 
     //-------
 
