@@ -16,6 +16,7 @@ const options = {
 export function Email(){
     const [tempEmail,setTempEmail]=useState(undefined)
     const  [timestamp,setTimeStamp]=useState(undefined)
+    const [isLoading,setIsLoading]=useState(false)
     // const [receivedMessage,setReceivedMessage]=useState(null)
         const [emailData, setEmailData] = useState(null);
       
@@ -42,10 +43,12 @@ export function Email(){
        
 const getEmail=async () =>{
     try {
+      setIsLoading(true)
       const response = await fetch(url, options);
       const result = await response.json();
       // console.log(result["items"])
       console.log(result);
+      setIsLoading(false)
       if(result.msg ===  'OK'){
         setTempEmail(result.items.email)
         setTimeStamp(result.items.timestamp)
@@ -58,19 +61,35 @@ const getEmail=async () =>{
   
   
   useEffect(() =>{
-    // fetchEmailData()
-    // if(user){
+
      return () => getEmail()
-   
-    // }
+
   },[])
 
-  console.log(emailData)
   
     return <>
-    <h1>hello world</h1>
-    <p>your temp email is : {tempEmail} </p>
-    <button onClick={getEmail}>get another </button>
-    <button onClick={fetchEmailData}>get message </button>
+    
+    <div className='border max-w-[900px] mx-auto border-accent1 border-dashed shadow-pinkBoxShadow2 p-6 rounded-xl mt-10'>
+      <h2 className='text-2xl text-center mb-10 mt-4'>Your Temporary Email Address</h2>
+      <div className="rounded-full p-4 px-6 bg-darkPink my-4">
+        {!isLoading &&  <p>{tempEmail}</p>}
+        {isLoading &&  <p>loading ...</p>}
+      </div>
+      
+      </div>
+      <div className=" p-4 max-w-[900px] mx-auto px-6 my-4 flex justify-between shadow-pinkBoxShadow2 p-6 rounded-xl mt-10">
+        <div className='bg-darkPink py-2 rounded-full px-5 text-sm'>
+          <button onClick={getEmail}>refresh</button>
+        </div>
+        <div className='bg-darkPink py-2 rounded-full px-5 text-sm'>
+          <button onClick={getEmail}>delete</button>
+        </div>
+        <div className='bg-darkPink py-2 rounded-full px-5 text-sm'>
+          <button onClick={getEmail}>change</button>
+        </div>
+        {/* <div>
+          <p>refresh</p>
+        </div> */}
+      </div>
     </>
 }
