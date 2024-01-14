@@ -1,9 +1,7 @@
 "use client"
-
 import { useState,useEffect } from "react";
 
 const url = 'https://temp-gmail.p.rapidapi.com/get?domain=gmail.com&username=random&server=server-1&type=real';
-const emailurl = 'https://temp-gmail.p.rapidapi.com/check?email=suggswirfigzv7825@gmail.com&timestamp=1705147131';
 const options = {
 	method: 'GET',
 	headers: {
@@ -12,6 +10,8 @@ const options = {
 	}
 };
 
+
+
 // `https://temp-gmail.p.rapidapi.com/check?email=chakkaphanjame44@gmail.com&timestamp=1705147017`
 export function Email(){
     const [tempEmail,setTempEmail]=useState(undefined)
@@ -19,11 +19,11 @@ export function Email(){
     const [isLoading,setIsLoading]=useState(false)
     // const [receivedMessage,setReceivedMessage]=useState(null)
         const [emailData, setEmailData] = useState(null);
-      
+        const emailurl = `https://temp-gmail.p.rapidapi.com/check?email=${tempEmail}&timestamp=${timestamp}`;
+
         const fetchEmailData = async () => {
-          try {
-            const response = await fetch(`https://temp-gmail.p.rapidapi.com/check?email=${tempEmail}&timestamp=${timestamp}`, options);
-      
+          try { 
+            const response = await fetch(emailurl, options);
             if (!response.ok) {
               throw new Error('Network request failed');
             }
@@ -77,7 +77,7 @@ const getEmail=async () =>{
       </div>
       
       </div>
-      <div className=" p-4 max-w-[900px] mx-auto px-6 my-4 flex justify-between shadow-pinkBoxShadow2 p-6 rounded-xl mt-10">
+      <div className="max-w-[900px] mx-auto px-6 my-4 flex justify-between shadow-pinkBoxShadow2 p-6 rounded-xl mt-10">
         <div className='bg-darkPink py-2 rounded-full px-5 text-sm'>
           <button onClick={getEmail}>refresh</button>
         </div>
@@ -90,6 +90,39 @@ const getEmail=async () =>{
         {/* <div>
           <p>refresh</p>
         </div> */}
+      </div>
+      <div className="max-w-[900px] mx-auto  my-4  shadow-pinkBoxShadow2 rounded-xl mt-10">
+      <div className="bg-darkPink flex rounded-t-lg justify-between py-2 mb-10">
+        <div className='py-2 rounded-full px-5 text-sm'>
+            <h4 >SENDER</h4>
+          </div>
+          <div className='py-2 rounded-full px-5 text-sm'>
+            <h4>SUBJECT</h4>
+          </div>
+          <div className='py-2 rounded-full px-5 text-sm'>
+            <h4>DATE</h4>
+          </div>
+      </div>
+      <div className="p-3">
+        
+        {emailData?.items.length === 0 && <p className="text-center mb-6">Your inbox is empty
+
+Waiting for incoming emails</p>}
+
+{emailData && emailData.items.length > 0 &&  emailData.items.map((item) =>{
+  {console.log(item)}
+  return <ul className="flex justify-between mb-6">
+  { <li>{item?.textFrom}</li> }
+  { <li>{item?.textSubject}</li> }
+  { <li>{item?.textDate}</li> }
+</ul>
+}) 
+ 
+ }
+<button className="bg-darkPink px-10 py-2 mt-6 rounded-md mb-6 mx-auto block" onClick={fetchEmailData}>refresh</button>
+
+      {/* </ul> */}
+      </div>
       </div>
     </>
 }
