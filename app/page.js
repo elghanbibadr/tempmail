@@ -8,10 +8,10 @@ export default async function Home() {
 
   const {data: {user}} = await supabase.auth.getUser()
  
-
+console.log(user)
   if (!user){
     return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen text-white flex-col items-center justify-between p-24">
         <Link href={'/login'}>
           You are not logged in. Click here to go login.
         </Link>

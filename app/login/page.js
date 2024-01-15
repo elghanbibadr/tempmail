@@ -66,23 +66,23 @@ export default function LoginPage(){
         return <h1>loading..</h1>
     }
 
-    // if (user){
-    //     return (
-    //         <div className="h-screen flex flex-col justify-center items-center bg-gray-100">
-    //         <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md w-96 text-center">
-    //             <h1 className="mb-4 text-xl font-bold text-gray-700 dark:text-gray-300">
-    //                 You're already logged in
-    //             </h1>
-    //             <button 
-    //                 onClick={handleLogout}
-    //                 className="w-full p-3 rounded-md bg-red-500 text-white hover:bg-red-600 focus:outline-none"
-    //             >
-    //                 Logout
-    //             </button>
-    //         </div>
-    //     </div>
-    //     )
-    // }
+    if (user){
+        return (
+            <div className="h-screen flex flex-col justify-center items-center bg-gray-100">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md w-96 text-center">
+                <h1 className="mb-4 text-xl font-bold text-gray-700 dark:text-gray-300">
+                    You're already logged in
+                </h1>
+                <button 
+                    onClick={handleLogout}
+                    className="w-full p-3 rounded-md bg-red-500 text-white hover:bg-red-600 focus:outline-none"
+                >
+                    Logout
+                </button>
+            </div>
+        </div>
+        )
+    }
 
     return (
         <main  className="flex flex-col justify-center items-center h-screen">

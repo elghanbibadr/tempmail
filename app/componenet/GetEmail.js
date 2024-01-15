@@ -1,6 +1,7 @@
 "use client"
 import { useState,useEffect } from "react";
-
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 const url = 'https://temp-gmail.p.rapidapi.com/get?domain=gmail.com&username=random&server=server-1&type=real';
 const options = {
 	method: 'GET',
@@ -14,10 +15,23 @@ const options = {
 
 // `https://temp-gmail.p.rapidapi.com/check?email=chakkaphanjame44@gmail.com&timestamp=1705147017`
 export function Email(){
+  const router = useRouter()
+
     const [tempEmail,setTempEmail]=useState(undefined)
     const  [timestamp,setTimeStamp]=useState(undefined)
     const [isLoading,setIsLoading]=useState(false)
     // const [receivedMessage,setReceivedMessage]=useState(null)
+    const supabase = createClientComponentClient();
+
+    useEffect(() => {
+      async function getUser(){
+          const {data: {user}} = await supabase.auth.getUser()
+          console.log(user)
+      }
+
+      getUser();
+  }, [])
+
         const [emailData, setEmailData] = useState(null);
         const emailurl = `https://temp-gmail.p.rapidapi.com/check?email=${tempEmail}&timestamp=${timestamp}`;
 
@@ -66,10 +80,21 @@ const getEmail=async () =>{
 
   },[])
 
+
+
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
+    // setUser(null)
+}
+
+
   
     return <>
     
     <div className='border max-w-[900px] mx-auto border-accent1 border-dashed shadow-pinkBoxShadow2 p-6 rounded-xl mt-10'>
+      <button className="bg-darkPink  p-2 rounded-md" onClick={handleLogout}>logout</button>
       <h2 className='text-2xl text-center mb-10 mt-4'>Your Temporary Email Address</h2>
       <div className="rounded-full p-4 px-6 bg-darkPink my-4">
         {!isLoading &&  <p>{tempEmail}</p>}
