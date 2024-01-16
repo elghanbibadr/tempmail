@@ -20,13 +20,14 @@ export function Email(){
     const [tempEmail,setTempEmail]=useState(undefined)
     const  [timestamp,setTimeStamp]=useState(undefined)
     const [isLoading,setIsLoading]=useState(false)
+    const [User,setUser]=useState(undefined)
     // const [receivedMessage,setReceivedMessage]=useState(null)
     const supabase = createClientComponentClient();
 
     useEffect(() => {
       async function getUser(){
           const {data: {user}} = await supabase.auth.getUser()
-          console.log(user)
+          setUser(user)
       }
 
       getUser();
@@ -56,6 +57,11 @@ export function Email(){
         // }, 1000);
        
 const getEmail=async () =>{
+  console.log('current tempmail is ' ,tempEmail)
+  console.log('current user id is ' ,User?.id)
+ 
+
+    // getStoredUserEmails()
     try {
       setIsLoading(true)
       const response = await fetch(url, options);
@@ -66,30 +72,69 @@ const getEmail=async () =>{
       if(result.msg ===  'OK'){
         setTempEmail(result.items.email)
         setTimeStamp(result.items.timestamp)
+  
       }
     } catch (error) {
       console.error(error);
     }
   }
-  
-  
-  
-  useEffect(() =>{
 
+  
+  useEffect( () =>{
+
+  
      return () => getEmail()
 
   },[])
 
 
+ async function getStoredUserEmails() {
+    console.log(tempEmail)
+  if(!tempEmail) return
+    const { data, error } = 
+    await supabase
+    .from('emailsList')
+    .insert([
+      { userIdEmail: User?.id,emailText: tempEmail },
+    ])
+    .select()
+  }
+
+  useEffect(  () =>{
+    console.log(User.id)
+    console.log(tempEmail)
+    const addNew=async () =>{
+    const {data,error}= await supabase
+    .from('emailsList')
+    .insert([
+      {userIdEmail:"HDJSGJGF6484",emailText:tempEmail},
+    ])
+    .select()   
+    console.log(data)
+  }
+ 
+
+  addNew()
+  },[tempEmail])
 
 
+console.log(User?.id)
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.refresh();
     // setUser(null)
 }
 
+useEffect(() =>{
+  const allData=async () =>{
+let { data: emailsList, error } = await supabase
+.from('emailsList')
+.select('*')
+console.log(emailsList)
+  }
 
+  allData()
+},[])
   
     return <>
     
@@ -116,7 +161,7 @@ const getEmail=async () =>{
           <p>refresh</p>
         </div> */}
       </div>
-      <div className="max-w-[900px] mx-auto  my-4  shadow-pinkBoxShadow2 rounded-xl mt-10">
+      {/* <div className="max-w-[900px] mx-auto  my-4  shadow-pinkBoxShadow2 rounded-xl mt-10">
       <div className="bg-darkPink flex rounded-t-lg justify-between py-2 mb-10">
         <div className='py-2 rounded-full px-5 text-sm'>
             <h4 >SENDER</h4>
@@ -146,8 +191,10 @@ Waiting for incoming emails</p>}
  }
 <button className="bg-darkPink px-10 py-2 mt-6 rounded-md mb-6 mx-auto block" onClick={fetchEmailData}>refresh</button>
 
-      {/* </ul> */}
       </div>
+      </div> */}
+      <div className="max-w-[900px] mx-auto px-6 my-4 flex justify-between shadow-pinkBoxShadow2 p-6 rounded-xl mt-10" >
+        <h3>your generated emails</h3>
       </div>
     </>
 }
