@@ -16,7 +16,7 @@ const options = {
 
 
 // `https://temp-gmail.p.rapidapi.com/check?email=chakkaphanjame44@gmail.com&timestamp=1705147017`
-export function Email(){
+export  function Email(){
   const router = useRouter()
 
     const [tempEmail,setTempEmail]=useState(undefined)
