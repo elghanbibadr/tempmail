@@ -28,6 +28,7 @@ export function Email(){
     const [currentViewedEmail,setCurrentViewedEmail]=useState("")
     const [currentViewedEmailTimeStamp,setCurrentViewedEmailTimeStamp]=useState("")
     const [emailData, setEmailData] = useState(null);
+    const [isLoadingPreviousGeneratedEmails, setIsLoadingPreviousGeneratedEmails]=useState(true)
 
     // const [receivedMessage,setReceivedMessage]=useState(null)
     const supabase = createClientComponentClient();
@@ -46,8 +47,7 @@ export function Email(){
     
   // FETCH THE INBOXES INSIDE THE CURRENTLY VIEWED EMAIL 
         const fetchEmailData = async () => {
-          console.log("temp email", tempEmail)
-          console.log("current email", currentViewedEmail)
+        
           const emailurl = `https://temp-gmail.p.rapidapi.com/check?email=${currentViewedEmail}&timestamp=${currentViewedEmailTimeStamp}`;
        
 
@@ -106,25 +106,7 @@ export function Email(){
 
 
 
-  console.log("email data", emailData)
-  // GETT A NEW EMAIL ADDRESS
-// const getEmail=async () =>{
-//     try {
-//       setIsLoading(true)
-//       const response = await fetch(url, options);
-//       const result = await response.json();
-//       // console.log(result["items"])
-//       console.log(result);
-//       setIsLoading(false)
-//       if(result.msg ===  'OK'){
-//         setTempEmail(result.items.email)
-//         setTimeStamp(result.items.timestamp)
-  
-//       }
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   }
+
 
 const getEmail = async () => {
   try {
@@ -137,19 +119,13 @@ const getEmail = async () => {
       const generatedEmail = result.items.email;
       const timestamp = result.items.timestamp;
     addNew()
-    // allData()
       // Store the generated email and timestamp in local storage
       localStorage.setItem('generatedEmail', generatedEmail);
       localStorage.setItem('timestamp', timestamp);
       
       setTempEmail(generatedEmail);
       setTimeStamp(timestamp);
-      // add the new email to the array of generated email 
-      
-      // const existingGeneratedEmails = JSON.parse(localStorage.getItem('generatedEmailsList')) || [];
-      // existingGeneratedEmails.push({email:tempEmail,timestamp:timestamp})
-
-        
+    
 
     }
   } catch (error) {
@@ -158,13 +134,6 @@ const getEmail = async () => {
 }
   
 
-
-console.log(emailData)
-
-  // GETTING A NEW EMAIL WHENEVER THE COMPONENET MOUNT
-  // useEffect( () =>{
-  //    return () => getEmail()
-  // },[])
 
 
 
@@ -179,11 +148,12 @@ console.log(User?.id)
 useEffect(() => {
   const allData = async () => {
     try {
+     
       let { data: emailsList, error } = await supabase
         .from('emailsList')
         .select()
         .eq('userIdEmail', User.id);
-
+        setIsLoadingPreviousGeneratedEmails(false)
       setUserGeneratedEmails(emailsList);
       console.log('emails list', emailsList);
     } catch (error) {
@@ -198,17 +168,6 @@ useEffect(() => {
 }, [User, tempEmail]);
 
 
-// useEffect( () =>{
-// const allData=async () =>{
-//   let { data: emailsList, error } = await supabase
-//   .from('emailsList')
-//   .select().eq('userIdEmail',User?.id)
-//   setUserGeneratedEmails(emailsList)
-//   console.log(emailsList)
-// }
-//  return () => allData()
-// },[User,tempEmail])
-// allData()
 
 
 
@@ -265,7 +224,10 @@ useEffect(() => {
       </div>
    
       <div className="max-w-[900px] mx-auto px-6 my-4 n shadow-pinkBoxShadow2 p-6 rounded-xl mt-10" >
-        <h3 className="text-center mb-10 uppercase text-red-600">your generated emails</h3>
+        <h3 className="text-center mb-10 uppercase text-white">Your Generated Emails</h3>
+        {userGeneratedEmails.length === 0 && isLoadingPreviousGeneratedEmails && <p className="text-white text-base text-center ">Getting Your previous email ... </p>}
+        {userGeneratedEmails.length === 0 && !isLoadingPreviousGeneratedEmails && <p className="text-white text-base text-center capitalize "> You has not genrated any email </p>}
+
         { userGeneratedEmails && userGeneratedEmails.map((item) =>{
           return  <h2 onClick={() => handleEmailSelected(item.emailText,item.timestamp)} key={item.id} className="my-3 cursor-pointer">{item.emailText}</h2>
         
