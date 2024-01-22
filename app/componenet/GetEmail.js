@@ -55,9 +55,20 @@ export function Email(){
           //getting the email inboxes
             const response = await fetch(emailurl, options);
             if (!response.ok) {
-              throw new Error('Network request failed');
+              console.log("yo this email is destroyed check supabase if there is some items")
+               console.log('Network request failed');
+               
+             let { data: emailInboxes, error } = await supabase
+             .from('emailInboxes')
+             .select('*')
+             .eq('textTo',currentViewedEmail)
+            // console.log(emailInboxes)
+             setEmailData({items:emailInboxes})
+             return 
             }
           
+
+            
             const data = await response.json();
             setEmailData(data);
             // if (data.items.length !==0)
@@ -68,7 +79,7 @@ export function Email(){
            await supabase
           .from('emailInboxes')
           .insert([
-          {textFrom:data.items[0].textFrom,textTo:data.items[0].textTo,textDate:data.items[0].textDate}
+          {textFrom:data.items[0].textFrom,textTo:data.items[0].textTo,textDate:data.items[0].textDate,textSubject:data.items[0].textSubject}
           ])
           .select()
         }
@@ -126,7 +137,7 @@ const getEmail = async () => {
       const generatedEmail = result.items.email;
       const timestamp = result.items.timestamp;
     addNew()
-    allData()
+    // allData()
       // Store the generated email and timestamp in local storage
       localStorage.setItem('generatedEmail', generatedEmail);
       localStorage.setItem('timestamp', timestamp);
@@ -135,8 +146,8 @@ const getEmail = async () => {
       setTimeStamp(timestamp);
       // add the new email to the array of generated email 
       
-      const existingGeneratedEmails = JSON.parse(localStorage.getItem('generatedEmailsList')) || [];
-      existingGeneratedEmails.push({email:tempEmail,timestamp:timestamp})
+      // const existingGeneratedEmails = JSON.parse(localStorage.getItem('generatedEmailsList')) || [];
+      // existingGeneratedEmails.push({email:tempEmail,timestamp:timestamp})
 
         
 
@@ -165,24 +176,46 @@ console.log(User?.id)
 }
 
 
-const allData=async () =>{
-  let { data: emailsList, error } = await supabase
-  .from('emailsList')
-  .select().eq('userIdEmail',User?.id)
-  setUserGeneratedEmails(emailsList)
-  console.log(emailsList)
-}
+useEffect(() => {
+  const allData = async () => {
+    try {
+      let { data: emailsList, error } = await supabase
+        .from('emailsList')
+        .select()
+        .eq('userIdEmail', User.id);
+
+      setUserGeneratedEmails(emailsList);
+      console.log('emails list', emailsList);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  // Call the function immediately when the component mounts
+ if(User) allData();
+
+  // Specify the dependencies for the useEffect
+}, [User, tempEmail]);
 
 
-useEffect( () =>{
- allData()
-},[User])
+// useEffect( () =>{
+// const allData=async () =>{
+//   let { data: emailsList, error } = await supabase
+//   .from('emailsList')
+//   .select().eq('userIdEmail',User?.id)
+//   setUserGeneratedEmails(emailsList)
+//   console.log(emailsList)
+// }
+//  return () => allData()
+// },[User,tempEmail])
 // allData()
 
 
 
 
+
 const handleEmailSelected=(selectedEmail,selectedEmailTimeStamp) =>{
+  setEmailData(null)
  setEmailSelected(true)
  setCurrentViewedEmail(selectedEmail)
  setCurrentViewedEmailTimeStamp(selectedEmailTimeStamp)
