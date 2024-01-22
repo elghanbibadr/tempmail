@@ -178,7 +178,7 @@ const handleEmailSelected=(selectedEmail,selectedEmailTimeStamp) =>{
  setEmailSelected(true)
  setCurrentViewedEmail(selectedEmail)
  setCurrentViewedEmailTimeStamp(selectedEmailTimeStamp)
- console.log(selectedEmailTimeStamp)
+ fetchEmailData()
 }
 
 
