@@ -153,18 +153,8 @@ export default function LoginPage(){
           <h5 className="scroll-m-20 font-heading text-lg font-medium text-white text-center">
             {isSignUp ? "Create account" : "Sign in to your account"}
           </h5>
-          <button
-           
-            className="button-transparent mt-6 w-full flex justify-between rounded-md p-4"
-          >
-            {/* <img className="h-6" src={googlelogo} alt="google logo image" /> */}
-            {/* <span className="text-center w-full  text-white">
-              Sign {isSignUp ? "up" : "in"} with Google
-            </span> */}
-          </button>
-          <span className="text-[.8rem] mt-4 font-medium flex items-center justify-center text-gray-400">
-            or continue with email
-          </span>
+        
+        
           <div >
           {/* onSubmit={handleSubmit(onSubmit)} */}
             <div className="mt-6">
