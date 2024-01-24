@@ -26,30 +26,55 @@ export default function LoginPage(){
 
 
     const handleSignUp = async () => {
+     
         const res = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                emailRedirectTo: `${location.origin}/auth/callback`
-            }
-        })
-        setUser(res.data.user)
+          email,
+          password,
+          options: {
+              emailRedirectTo: `${location.origin}/auth/callback`
+          }
+      })
+        console.log(res.error)
+        if (res.error){
+          console.log('first')
+           alert(res.error)
+          return 
+        }
+        // console.log("res", res.error)
+        setUser(res.data.user);
+        setEmail('');
+        setPassword('');
+        // Refresh the router, clear email, and clear password only if sign-in is successful
         router.refresh();
-        setEmail('')
-        setPassword('')
+        
+      
     }
 
     const handleSignIn = async () => {
+      try {
         const res = await supabase.auth.signInWithPassword({
-            email,
-            password
-        })
-        setUser(res.data.user)
+          email,
+          password
+        });
+        console.log(res.error)
+        if (res.error){
+          console.log('first')
+           alert(res.error)
+          return 
+        }
+        // console.log("res", res.error)
+        setUser(res.data.user);
+        setEmail('');
+        setPassword('');
+        // Refresh the router, clear email, and clear password only if sign-in is successful
         router.refresh();
-        setEmail('')
-        setPassword('')
-    }
-
+        
+      } catch (e) {
+        console.log(e.message)
+        alert(e.message);
+      }
+    };
+    
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.refresh();
@@ -133,9 +158,9 @@ export default function LoginPage(){
             className="button-transparent mt-6 w-full flex justify-between rounded-md p-4"
           >
             {/* <img className="h-6" src={googlelogo} alt="google logo image" /> */}
-            <span className="text-center w-full  text-white">
+            {/* <span className="text-center w-full  text-white">
               Sign {isSignUp ? "up" : "in"} with Google
-            </span>
+            </span> */}
           </button>
           <span className="text-[.8rem] mt-4 font-medium flex items-center justify-center text-gray-400">
             or continue with email
@@ -197,21 +222,7 @@ export default function LoginPage(){
               </button>
             )}
           </div>
-          <div className="text-[.8rem] font-medium flex justify-center gap-1 items-center mt-4">
-            <span className="text-white">
-              {" "}
-              {isSignUp
-                ? "Already have an account"
-                : "Do not have an account yet?"}
-            </span>
-            {
-            //   <Link href={`${isSignUp ? "/auth/signin" : "/auth/signup"}`}>
-            //     <span className="text-darkPink cursor-pointer hover:underline">
-            //       {isSignUp ? "Sign In" : "Sign Up"}
-            //     </span>
-            //   </Link>
-            }
-          </div>
+       
         </div>
       </div>
     {/* </div> */}
