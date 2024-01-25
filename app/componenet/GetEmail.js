@@ -2,6 +2,8 @@
 import { useState,useEffect } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
+import copy from 'clipboard-copy';
+
 import Link from "next/link";
 import Image from 'next/image'
 const url = 'https://temp-gmail.p.rapidapi.com/get?domain=gmail.com&username=random&server=server-1&type=real';
@@ -47,7 +49,9 @@ export  function Email(){
 
     
   // FETCH THE INBOXES INSIDE THE CURRENTLY VIEWED EMAIL 
-        const fetchEmailData = async () => {        
+        const fetchEmailData = async () => {   
+          console.log("currentViewdIs",currentViewedEmail)
+            // alert("clicked")
           const emailurl = `https://temp-gmail.p.rapidapi.com/check?email=${currentViewedEmail}&timestamp=${currentViewedEmailTimeStamp}`;
           try { 
           //getting the email inboxes
@@ -65,17 +69,21 @@ export  function Email(){
               // Keep only the first occurrence of each textSubject
               return array.findIndex((el) => el.textSubject === item.textSubject) === index;
             });
+            // console.log( "emailinboxes *******", emailInboxes)
+            setIsLoadingEmailInbox(false)
+
              setEmailData({items:emailInboxesFilter})
-             console.log( 'duplicated removed' , emailInboxesFilter)
+
              return 
             }                    
             const data = await response.json();
+            setIsLoadingEmailInbox(false)
+
             setEmailData(data);
             // if (data.items.length !==0)
             console.log('email data', data)
           //storing email data to supabase 
           if (data.items && data.items.length > 0) {
-            console.log(data.items[0].textFrom);      
            await supabase
           .from('emailInboxes')
           .insert([
@@ -86,8 +94,6 @@ export  function Email(){
           } catch (error) {
              alert('this email has been destroyed')
             console.error('Error fetching data:', error);
-          }finally{
-            setIsLoadingEmailInbox(false)
           }
         }
       
@@ -95,7 +101,6 @@ export  function Email(){
 
     
        
-  console.log(currentViewedEmail)
   const addNew=async () =>{
     const {data,error}= await supabase
     .from('emailsList')
@@ -103,7 +108,6 @@ export  function Email(){
       {userIdEmail:User?.id,emailText:tempEmail,timestamp:timestamp},
     ])
     .select()   
-    console.log(data)
   }
 
 
@@ -136,7 +140,6 @@ const getEmail = async () => {
 
 const handleEmailDeleted=async (itemId) => {
   setUserDeleteEmail(true)
-  console.log(itemId)
   try {
     const { data, error } = await supabase
       .from("emailsList")
@@ -147,6 +150,8 @@ const handleEmailDeleted=async (itemId) => {
       console.error('Error deleting item:', error.message);
       } else {
        console.log('Item deleted successfully:', data);
+       window.location.reload(true);
+
        }
   } catch (e) {
     console.log('error')
@@ -154,7 +159,6 @@ const handleEmailDeleted=async (itemId) => {
 }
 
 
-console.log(User?.id)
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.refresh();
@@ -187,7 +191,10 @@ useEffect(() => {
 
 
 
-
+useEffect(() =>{
+  // console.log("currentViewd1", currentViewedEmail)
+  fetchEmailData()
+},[emailSelected])
 
 
 const handleEmailSelected=(selectedEmail,selectedEmailTimeStamp) =>{
@@ -196,7 +203,7 @@ const handleEmailSelected=(selectedEmail,selectedEmailTimeStamp) =>{
  setEmailSelected(true)
  setCurrentViewedEmail(selectedEmail)
  setCurrentViewedEmailTimeStamp(selectedEmailTimeStamp)
- fetchEmailData()
+
 
 }
 
@@ -215,7 +222,17 @@ useEffect(() => {
 }, []);
 
 
-
+const handleEmailCopied = (text) => {
+  try {
+    copy(text);
+    // Optionally, you can provide feedback to the user
+    alert('Email copied to clipboard!');
+  } catch (error) {
+    console.error('Error copying to clipboard:', error);
+    // Optionally, you can provide feedback to the user
+    alert('Failed to copy email to clipboard.');
+  }
+};
     return <div className="max-w-[900px] mx-auto">
       <div className="flex justify-between items-center">
       <h3 className="text-xl">Temp Mail</h3>
@@ -238,15 +255,26 @@ useEffect(() => {
           return  <div className="flex items-center justify-between" >
                        
                  <h2 onClick={() => handleEmailSelected(item.emailText,item.timestamp)} key={item.id} className="my-3 cursor-pointer">{item.emailText}</h2>
-                 <Image
-                
-                onClick={() => handleEmailDeleted(item.id)}
-      src="/delete.svg"
-      width={14}
-      height={14}
-      className="cursor-pointer"
-      alt="Picture of the author"
-    />
+                 <div className="flex gap-8">
+                   <Image
+                                   
+                                   onClick={() => handleEmailDeleted(item.id)}
+                                   src="/delete.svg"
+                                   width={14}
+                   height={14}
+                   className="cursor-pointer"
+                                   alt="Picture of the author"
+                       />
+                           <Image
+                                   
+                                   onClick={() => handleEmailCopied(item.emailText)}
+                                   src="/copyIcon.svg"
+                                   width={14}
+                   height={14}
+                   className="cursor-pointer"
+                                   alt="Picture of the author"
+                       />
+                 </div>
                 
                 </div>
         
@@ -256,9 +284,12 @@ useEffect(() => {
          <div className="">
          
            {emailSelected && <div className="bg-[#333] fixed h-screen w-screen inset-0 flex flex-col items-center ">
-           <div onClick={() => setEmailSelected(false)} className="flex cursor-pointer self-start justify-self-start mt-4">
+           <div onClick={() =>{
+          setEmailSelected(false)
+          setEmailData(null)
+           } } className="flex cursor-pointer self-start justify-self-start mt-4">
              <svg  className="h-6 rotate-180 mx-2" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25"><title>Artboard-34</title><g id="Right-2" data-name="Right"><polygon points="17.5 5.999 16.793 6.706 22.086 11.999 1 11.999 1 12.999 22.086 12.999 16.792 18.294 17.499 19.001 24 12.499 17.5 5.999" /></g></svg>
-             <h2>Back</h2>
+             <h2 >Back</h2>
               
            </div>
               <div className=" mx-auto  my-4 w-[80%]  shadow-pinkBoxShadow2 rounded-xl mt-10">
@@ -275,8 +306,9 @@ useEffect(() => {
               </div>
                     </div>
                     <div className="p-3">
-                      {isLoadingEmailInbox && <p className="text-white text-xl">loading ...</p>}
                       {emailData?.items.length === 0 && !isLoadingEmailInbox && <p className="text-center mb-6">Your inbox is empty Waiting for incoming emails</p>}
+                      {isLoadingEmailInbox &&   <p className="text-white text-center text-md">loading ...</p>}
+
            
               {emailData && emailData.items.length > 0 &&  emailData.items.map((item,index) =>{
                 {console.log(item)}
