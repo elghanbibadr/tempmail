@@ -33,6 +33,8 @@ export  function Email(){
     const [isLoadingPreviousGeneratedEmails, setIsLoadingPreviousGeneratedEmails]=useState(true)
     const [userDeleteEmail,setUserDeleteEmail]=useState(false)
     const [isLoadingEmailInbox,setIsLoadingEmailInbox]=useState(false)
+    const [htmlContent, setHtmlContent] = useState('');
+
     // const [receivedMessage,setReceivedMessage]=useState(null)
     const supabase = createClientComponentClient();
 
@@ -87,7 +89,7 @@ export  function Email(){
            await supabase
           .from('emailInboxes')
           .insert([
-          {textFrom:data.items[0].textFrom,textTo:data.items[0].textTo,textDate:data.items[0].textDate,textSubject:data.items[0].textSubject}
+          {textFrom:data.items[0].textFrom,textTo:data.items[0].textTo,textDate:data.items[0].textDate,textSubject:data.items[0].textSubject,mid:data.items[0].mid}
           ])
           .select()
         }
@@ -190,7 +192,6 @@ useEffect(() => {
 
 
 
-
 useEffect(() =>{
   // console.log("currentViewd1", currentViewedEmail)
   fetchEmailData()
@@ -208,6 +209,57 @@ const handleEmailSelected=(selectedEmail,selectedEmailTimeStamp) =>{
 }
 
 
+const getEmailContent=async (mid,email)=>{
+
+  console.log("currently viewed",currentViewedEmail)
+  console.log("tempmail",tempEmail)
+  console.log("html content",htmlContent)
+
+  if (currentViewedEmail === tempEmail){
+    // fetch the api and get the html content if there
+    const  modifiedEmail = email.replace(/@/g, '%40');
+
+    const url = `https://temp-gmail.p.rapidapi.com/read?email=${modifiedEmail}&message_id=${mid}`;
+  
+  
+  try {
+    const response = await fetch(url, options);
+    const result = await response.json();
+    
+    const body = result.body;
+    console.log("result",result.items.body)
+   setHtmlContent(result.items.body)
+    const { data, error } = await supabase
+    .from('emailInboxes')
+    .update({htmlContent:result.items.body})
+    .eq("mid",mid)
+    .is('htmlContent', null)  // This checks if htmlContent is null
+    .select()
+  } catch (error) {
+    console.error(error);
+  }
+    // otherwise check supabase inboxes if this targeted email home some html content
+
+
+  }else{
+    console.log("this email already destroed")
+    let { data: currentMessageHtmlContent, error } = await supabase
+    .from('emailInboxes')
+    .select('htmlContent')
+    .eq('mid', mid);
+
+    console.log(currentMessageHtmlContent)
+    setHtmlContent(currentMessageHtmlContent[0].htmlContent)
+  }
+ 
+
+  // setHtmlContent(result.items.body)
+  // Update the state with the HTML content
+  // if(result.body){
+  //   setHtmlContent(result.body);  }
+
+}
+
 // TEST FETCHES
   // fetch(`https://temp-gmail.p.rapidapi.com/check?email=mallinakwalthalladxis68@gmail.com&timestamp=1705506058`,options).then(res=>res.json()).then(data=>console.log(data))
 // Retrieve stored values from local storage on page load
@@ -221,6 +273,8 @@ useEffect(() => {
   }
 }, []);
 
+
+console.log('html content',htmlContent)
 
 const handleEmailCopied = (text) => {
   try {
@@ -254,7 +308,7 @@ const handleEmailCopied = (text) => {
         { userGeneratedEmails && userGeneratedEmails.map((item) =>{
           return  <div className="flex items-center justify-between" >
                        
-                 <h2 onClick={() => handleEmailSelected(item.emailText,item.timestamp)} key={item.id} className="my-3 cursor-pointer">{item.emailText}</h2>
+                 <h2 onClick={() => handleEmailSelected( item.emailText,item.timestamp)} key={item.id} className="my-3 cursor-pointer">{item.emailText}</h2>
                  <div className="flex gap-8">
                    <Image
                                    
@@ -283,16 +337,17 @@ const handleEmailCopied = (text) => {
 
          <div className="">
          
-           {emailSelected && <div className="bg-[#333] fixed h-screen w-screen inset-0 flex flex-col items-center ">
+           {emailSelected && <div className="bg-[#333] fixed h-screen overflow-scroll   w-screen inset-0 flex flex-col items-center ">
            <div onClick={() =>{
           setEmailSelected(false)
           setEmailData(null)
+          // setHtmlContent("")
            } } className="flex cursor-pointer self-start justify-self-start mt-4">
              <svg  className="h-6 rotate-180 mx-2" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25"><title>Artboard-34</title><g id="Right-2" data-name="Right"><polygon points="17.5 5.999 16.793 6.706 22.086 11.999 1 11.999 1 12.999 22.086 12.999 16.792 18.294 17.499 19.001 24 12.499 17.5 5.999" /></g></svg>
              <h2 >Back</h2>
               
            </div>
-              <div className=" mx-auto  my-4 w-[80%]  shadow-pinkBoxShadow2 rounded-xl mt-10">
+              <div className=" mx-auto  my-4 w-[80%] h-full overflow-y-scroll  shadow-pinkBoxShadow2 rounded-xl mt-10">
                 {/* <h2 className="text-white">{currentViewedEmail}</h2> */}
                     <div className="bg-darkPink flex rounded-t-lg justify-between py-2 mb-10">
                       <div className='py-2 rounded-full px-5 text-sm'>
@@ -312,14 +367,17 @@ const handleEmailCopied = (text) => {
            
               {emailData && emailData.items.length > 0 &&  emailData.items.map((item,index) =>{
                 {console.log(item)}
-                return <ul key={index} className="flex justify-between mb-6">
+                return <ul key={index} onClick={() =>getEmailContent(item.mid,item.textTo)} className="flex cursor-pointer justify-between mb-6">
                 { <li>{item?.textFrom}</li> }
                 { <li>{item?.textSubject}</li> }
                 { <li>{item?.textDate}</li> }
               </ul>
-              })
-           
+              })          
                }
+          { htmlContent !=="" &&     <div onClick={() => setHtmlContent('')} className="bg-[#444] absolute w-screen top-0 left-0 right-0 h-[900px]">
+      {/* Render the HTML content */}
+      <div  className="m-10"  dangerouslySetInnerHTML={{ __html: htmlContent }} />
+    </div>}
               <button className="bg-darkPink px-10 py-2 mt-6 rounded-md mb-6 mx-auto block" onClick={fetchEmailData}>refresh</button>
            
                     </div>
