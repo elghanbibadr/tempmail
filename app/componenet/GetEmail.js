@@ -363,7 +363,6 @@ const handleEmailCopied = (text) => {
                     <div className="p-3">
                       {emailData?.items.length === 0 && !isLoadingEmailInbox && <p className="text-center mb-6">Your inbox is empty Waiting for incoming emails</p>}
                       {isLoadingEmailInbox &&   <p className="text-white text-center text-md">loading ...</p>}
-
            
               {emailData && emailData.items.length > 0 &&  emailData.items.map((item,index) =>{
                 {console.log(item)}
@@ -374,9 +373,18 @@ const handleEmailCopied = (text) => {
               </ul>
               })          
                }
-          { htmlContent !=="" &&     <div onClick={() => setHtmlContent('')} className="bg-[#444] absolute w-screen top-0 left-0 right-0 h-[900px]">
+          { htmlContent !=="" &&     <div  className="bg-[#444] absolute w-screen top-0 left-0 right-0 h-[900px]">
+          <Image
+                                   
+                                  onClick={() => setHtmlContent('')}
+                                   src="/icon-close.svg"
+                                   width={20}
+                   height={20}
+                   className="cursor-pointer relative top-4 left-6"
+                                   alt="Picture of the author"
+                       />
       {/* Render the HTML content */}
-      <div  className="m-10"  dangerouslySetInnerHTML={{ __html: htmlContent }} />
+      <div  className="m-10 mx-auto "  dangerouslySetInnerHTML={{ __html: htmlContent }} />
     </div>}
               <button className="bg-darkPink px-10 py-2 mt-6 rounded-md mb-6 mx-auto block" onClick={fetchEmailData}>refresh</button>
            
